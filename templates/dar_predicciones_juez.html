@@ -1,0 +1,27 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<h2>Dar Predicciones y Resultados</h2>
+<p>Publica el desempeño general y el resultado final para un participante.</p>
+
+<form method="POST" action="{{ url_for('dar_predicciones_juez') }}">
+    <div class="form-group">
+        <label for="participante_id">Seleccionar Participante:</label>
+        <select id="participante_id" name="participante_id" required>
+            <option value="">Selecciona un participante</option>
+            {% for participante in participantes %}
+            <option value="{{ participante.id }}">{{ participante.nombre_completo }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="desempeno_general">Desempeño General:</label>
+        <textarea id="desempeno_general" name="desempeno_general" rows="6" placeholder="Ej. Demostró un buen entendimiento de los conceptos, pero necesita mejorar en la precisión de los cálculos." required></textarea>
+    </div>
+    <div class="form-group">
+        <label for="resultado_final">Resultado Final (Ej. "Ganador", "Finalista", "Participación destacada", "No clasificado"):</label>
+        <input type="text" id="resultado_final" name="resultado_final" required>
+    </div>
+    <button type="submit" class="btn">Publicar Predicción/Resultado</button>
+</form>
+{% endblock %}

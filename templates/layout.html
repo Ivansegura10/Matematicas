@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concurso de Matemáticas</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        /* Estilos CSS personalizados */
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f8f9fa; /* Color de fondo ligero */
+        }
+        #sidebar {
+            min-width: 250px;
+            max-width: 250px;
+            background: #343a40; /* Color de fondo oscuro para el sidebar */
+            color: #fff; /* Texto blanco */
+            transition: all 0.3s; /* Transición suave para el colapso/expansión */
+        }
+        #sidebar.active {
+            margin-left: -250px; /* Oculta el sidebar */
+        }
+        #sidebar .sidebar-header {
+            padding: 20px;
+            background: #212529; /* Color más oscuro para el encabezado del sidebar */
+            text-align: center;
+        }
+        #sidebar ul.components {
+            padding: 20px 0;
+            border-bottom: 1px solid #47748b; /* Separador */
+        }
+        #sidebar ul li a {
+            padding: 10px;
+            font-size: 1.1em;
+            display: block;
+            color: #ccc; /* Color de texto para enlaces no activos */
+            text-decoration: none;
+        }
+        #sidebar ul li a:hover {
+            color: #fff; /* Texto blanco al pasar el ratón */
+            background: #495057; /* Fondo gris oscuro al pasar el ratón */
+        }
+        #sidebar ul li.active > a, a[aria-expanded="true"] {
+            color: #fff;
+            background: #007bff; /* Color azul primario de Bootstrap para el elemento activo */
+        }
+        #content {
+            width: 100%;
+            padding: 20px;
+            min-height: 100vh;
+            transition: all 0.3s;
+        }
+        .flash-message {
+            margin-top: 20px;
+        }
+        /* Estilos para tarjetas */
+        .card {
+            border-radius: 0.5rem;
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,.1);
+            margin-bottom: 1.5rem;
+        }
+        .card-header {
+            background-color: #007bff;
+            color: white;
+            border-bottom: 1px solid rgba(0,0,0,.125);
+            border-radius: calc(0.5rem - 1px) calc(0.5rem - 1px) 0 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <h3>Concurso</h3>
+        </div>
+        <ul class="list-unstyled components">
+            <li>
+                <a href="{{ url_for('index') }}" class="nav-link {% if request.endpoint == 'index' or request.endpoint == 'login' %}active{% endif %}">
+                    <i class="fas fa-home"></i> Inicio
+                </a>
+            </li>
+
+            {% if session.get('rol') == 'alumno' %}
+            <li>
+                <a href="{{ url_for('alumno_dashboard') }}" class="nav-link {% if request.endpoint == 'alumno_dashboard' %}active{% endif %}">
+                    <i class="fas fa-chart-line"></i> Dashboard Alumno
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('registrar_participante') }}" class="nav-link {% if request.endpoint == 'registrar_participante' %}active{% endif %}">
+                    <i class="fas fa-user-plus"></i> Registrar Participante
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('ver_criterios_alumno') }}" class="nav-link {% if request.endpoint == 'ver_criterios_alumno' %}active{% endif %}">
+                    <i class="fas fa-clipboard-list"></i> Criterios de Evaluación
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('responder_actividades') }}" class="nav-link {% if request.endpoint == 'responder_actividades' %}active{% endif %}">
+                    <i class="fas fa-edit"></i> Responder Actividades
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('ver_predicciones_alumno') }}" class="nav-link {% if request.endpoint == 'ver_predicciones_alumno' %}active{% endif %}">
+                    <i class="fas fa-chart-bar"></i> Ver Predicciones/Resultados
+                </a>
+            </li>
+            {% endif %}
+
+            {% if session.get('rol') == 'juez' %}
+            <li>
+                <a href="{{ url_for('juez_dashboard') }}" class="nav-link {% if request.endpoint == 'juez_dashboard' %}active{% endif %}">
+                    <i class="fas fa-chart-line"></i> Dashboard Juez
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('ver_participantes_juez') }}" class="nav-link {% if request.endpoint == 'ver_participantes_juez' %}active{% endif %}">
+                    <i class="fas fa-users"></i> Ver Participantes
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('ver_criterios_juez') }}" class="nav-link {% if request.endpoint == 'ver_criterios_juez' %}active{% endif %}">
+                    <i class="fas fa-scroll"></i> Criterios de Evaluación
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('calificar_actividades') }}" class="nav-link {% if request.endpoint == 'calificar_actividades' %}active{% endif %}">
+                    <i class="fas fa-tasks"></i> Calificar Actividades
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('dar_predicciones_juez') }}" class="nav-link {% if request.endpoint == 'dar_predicciones_juez' %}active{% endif %}">
+                    <i class="fas fa-paper-plane"></i> Dar Predicciones
+                </a>
+            </li>
+            {% endif %}
+
+            {% if session.get('loggedin') %}
+            <li>
+                <a href="{{ url_for('logout') }}" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión ({{ session.get('username') }})
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div id="content">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <button type="button" id="sidebarCollapse" class="btn btn-info">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="nav navbar-nav ml-auto">
+                        {% if session.get('loggedin') %}
+                            <li class="nav-item active">
+                                <a class="nav-link" href="#">Bienvenido, {{ session.get('username') }} ({{ session.get('rol') }})</a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('login') }}">Iniciar Sesión</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} flash-message alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+
+        <footer class="mt-4 text-center text-muted">
+            <p>&copy; 2023 Concurso de Matemáticas. Todos los derechos reservados.</p>
+        </footer>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#sidebarCollapse').on('click', function () {
+                $('#sidebar').toggleClass('active');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<h2>Calificar Actividades</h2>
+<p>Revisa las respuestas de los participantes y asigna puntajes según los criterios de evaluación.</p>
+
+{% if respuestas %}
+    {% for respuesta in respuestas %}
+    <div class="card" style="margin-bottom: 30px; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
+        <h3>Actividad: {{ respuesta.titulo_actividad }}</h3>
+        <p><strong>Participante:</strong> {{ respuesta.nombre_participante }}</p>
+        <p><strong>Fecha de Respuesta:</strong> {{ respuesta.fecha_respuesta }}</p>
+        <p><strong>Respuesta del Alumno:</strong></p>
+        <div style="background-color: #f9f9f9; padding: 10px; border-radius: 4px; border: 1px dashed #ccc; margin-bottom: 15px;">
+            <p>{{ respuesta.respuesta_texto }}</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('guardar_calificacion') }}">
+            <input type="hidden" name="respuesta_id" value="{{ respuesta.respuesta_id }}">
+            
+            <h4>Asignar Puntajes:</h4>
+            {% for criterio in criterios %}
+            <div class="form-group">
+                <label for="puntaje_{{ criterio.id }}">{{ criterio.nombre_criterio }} (Máx. {{ criterio.puntaje_maximo }} puntos):</label>
+                <input type="number" id="puntaje_{{ criterio.id }}" name="puntaje_{{ criterio.id }}" 
+                        min="0" max="{{ criterio.puntaje_maximo }}" placeholder="Puntaje" required>
+            </div>
+            {% endfor %}
+            
+            <div class="form-group">
+                <label for="comentarios_generales_{{ respuesta.respuesta_id }}">Comentarios Generales:</label>
+                <textarea id="comentarios_generales_{{ respuesta.respuesta_id }}" name="comentarios_generales" rows="4"></textarea>
+            </div>
+            
+            <button type="submit" class="btn">Guardar Calificación</button>
+        </form>
+    </div>
+    {% endfor %}
+{% else %}
+<p>No hay respuestas de actividades pendientes de calificación.</p>
+{% endif %}
+{% endblock %}
